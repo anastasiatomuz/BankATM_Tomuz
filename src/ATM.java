@@ -1,3 +1,4 @@
+import java.util.Scanner;
 public class ATM {
     /*
     1. welcome user
@@ -31,4 +32,16 @@ public class ATM {
          -yes: ask for PIN again; return to Main menu
          -no: thank the user for visiting
      */
+
+    private Scanner scan;
+    public ATM(){
+        this.scan = new Scanner(System.in);
+    }
+    public void start() {
+        System.out.println("Welcome to the ATM!");
+        System.out.println("To use the ATM, you must create an account.");
+        System.out.print("Please enter your full name: ");
+        String userName = scan.nextLine();
+        int PIN = scan.nextInt();
+    }
 }
