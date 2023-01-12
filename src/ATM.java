@@ -42,6 +42,10 @@ public class ATM {
         System.out.println("To use the ATM, you must create an account.");
         System.out.print("Please enter your full name: ");
         String userName = scan.nextLine();
+        System.out.print("Please enter the PIN you will wish to use to log into your account: ");
         int PIN = scan.nextInt();
+        Customer customer = new Customer(userName, PIN);
+        System.out.println(customer.withdraw(0,40));
+        System.out.println(customer.obtainAccountBalance());
     }
 }
