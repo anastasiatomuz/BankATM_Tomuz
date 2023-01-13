@@ -39,13 +39,47 @@ public class ATM {
     }
     public void start() {
         System.out.println("Welcome to the ATM!");
-        System.out.println("To use the ATM, you must create an account.");
+        System.out.println("To use the ATM, you must create an account.\n");
         System.out.print("Please enter your full name: ");
         String userName = scan.nextLine();
-        System.out.print("Please enter the PIN you will wish to use to log into your account: ");
+        System.out.print("Please enter a four digit PIN you will wish to use to log into your account: ");
         int PIN = scan.nextInt();
+        while (PIN < 1000 || PIN > 9999){
+            System.out.println("PIN doesn't match criteria.");
+            System.out.println("PIN must be 4 digit long.");
+            System.out.print("Enter a new PIN: ");
+            PIN = scan.nextInt();
+        }
         Customer customer = new Customer(userName, PIN);
-        System.out.println(customer.withdraw(0,40));
+        Account savings = new Account("Savings account", 0);
+        Account checking = new Account("Checking account", 0);
+        System.out.println("Two new accounts have been created");
         System.out.println(customer.obtainAccountBalance());
+        menu();
+    }
+
+    public void menu(){
+        boolean open = true;
+        while (open) {
+            System.out.println("Here is a list of available actions: ");
+            System.out.println("1. Make a withdrawal");
+            System.out.println("2. Make a deposit");
+            System.out.println("3. Transfer money between accounts");
+            System.out.println("4. Get account balances");
+            System.out.println("5. Change PIN");
+            System.out.println("6. Exit");
+
+            int userChoice = scan.nextInt();
+
+            if (userChoice == 3){
+                System.out.println("1. Savings account");
+                System.out.println("2. Checking account");
+                System.out.print("Which account do you want to transfer from? ");
+                int accountFromChoice = scan.nextInt();
+                if (accountFromChoice == 1){
+
+                }
+            }
+        }
     }
 }
