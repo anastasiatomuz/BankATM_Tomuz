@@ -6,4 +6,19 @@ public class Account {
         this.name = name;
         this.balance = balance;
     }
+
+    public void deposit(double moneyToAdd){
+        balance += moneyToAdd;
+    }
+    public double getBalance(){
+        return balance;
+    }
+
+    public void withdraw(double moneyToWithdraw){
+        balance -= moneyToWithdraw;
+    }
+    public String getName()
+    {
+        return name;
+    }
 }

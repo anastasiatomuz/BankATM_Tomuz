@@ -4,91 +4,99 @@ import java.util.ArrayList;
 public class Customer {
     private String name;
     private int PIN;
-    private double savingsAccountAmount;
-    private double checkingAccountAmount;
+
 
     public Customer(String name, int PIN){
         this.name = name;
         this.PIN = PIN;
-        savingsAccountAmount = 100;
-        checkingAccountAmount = 5000;
-    }
-    
-    /**
-    *
-    * precondition: amount is a valid amount (a multiple of 5)
-    * @param accountType = 0 for savings account; 1 for checking account
-    * @param amount = the amount of money user wants to withdraw (should be a multiple of 5)
-    * @return True if transaction was successful
-    */
-    public boolean withdraw(int accountType, int amount){
-        //distinguish the account from which the user wants to make a withdrawal
-        double accountAmount;
-        if (accountType == 0){
-            accountAmount = savingsAccountAmount;
-        } else  {
-            accountAmount = checkingAccountAmount;
-        }
-        
-        //checks if user has enough money in their account
-        if (!enoughMoney(accountAmount, amount)) {
-            return false;
-        }
-        
-        //check different ways to split up between 20 and 5 dollar bills
-        //first value of hashmap to implement num of 20's used, 2nd value = # of 5's used
-        determineBillQuantities(amount);
-        
-        
-        
-        //subtract money from account
-        if (accountType == 0){
-            savingsAccountAmount -= amount;
-        } else {
-            checkingAccountAmount -= amount;
-        }
-        return true; //operations performed successfully
-    }
-    
-    public void deposit(int accountType, double amount){
-    //checks which account
-        if (accountType == 0){
-            savingsAccountAmount += amount;
-        } else if (accountType == 1) {
-            checkingAccountAmount += amount;
-        }
-    }
-    
-    public boolean transfer(int fromAccount, int toAccount, double amount){
-        //find the amount of money available in the fromAccount depending on the type of account
-        double fromQuantity;
-        if (fromAccount == 0){
-            fromQuantity = savingsAccountAmount;
-        } else {
-            fromQuantity = checkingAccountAmount;
-        }
 
-        //checks if fromAccount has enough money for transaction to be valid
-        if (!enoughMoney(fromQuantity, amount)){
-            return false;
-        }
-
-        //transfer money
-        if (fromAccount == 0){
-            savingsAccountAmount -= amount;
-            checkingAccountAmount += amount;
-        } else {
-            checkingAccountAmount -= amount;
-            savingsAccountAmount += amount;
-        }
-        //transaction completed successfully
-        return true;
     }
 
-    //creates printable String of money available in each account
-    public String obtainAccountBalance(){
-        return "Savings Account: $" + savingsAccountAmount + "\nChecking Account: $" + checkingAccountAmount;
+    public int getPIN()
+    {
+        return PIN;
     }
+
+    public void setPIN(int newPIN)
+    {
+        PIN = newPIN;
+    }
+//
+//    /**
+//    *
+//    * precondition: amount is a valid amount (a multiple of 5)
+//    * @param accountType = 0 for savings account; 1 for checking account
+//    * @param amount = the amount of money user wants to withdraw (should be a multiple of 5)
+//    * @return True if transaction was successful
+//    */
+//    public boolean withdraw(int accountType, int amount){
+//        //distinguish the account from which the user wants to make a withdrawal
+//        double accountAmount;
+//        if (accountType == 0){
+//            accountAmount = savingsAccountAmount;
+//        } else  {
+//            accountAmount = checkingAccountAmount;
+//        }
+//
+//        //checks if user has enough money in their account
+//        if (!enoughMoney(accountAmount, amount)) {
+//            return false;
+//        }
+//
+//        //check different ways to split up between 20 and 5 dollar bills
+//        //first value of hashmap to implement num of 20's used, 2nd value = # of 5's used
+//        determineBillQuantities(amount);
+//
+//
+//
+//        //subtract money from account
+//        if (accountType == 0){
+//            savingsAccountAmount -= amount;
+//        } else {
+//            checkingAccountAmount -= amount;
+//        }
+//        return true; //operations performed successfully
+//    }
+//
+//    public void deposit(int accountType, double amount){
+//    //checks which account
+//        if (accountType == 0){
+//            savingsAccountAmount += amount;
+//        } else if (accountType == 1) {
+//            checkingAccountAmount += amount;
+//        }
+//    }
+//
+//    public boolean transfer(int fromAccount, int toAccount, double amount){
+//        //find the amount of money available in the fromAccount depending on the type of account
+//        double fromQuantity;
+//        if (fromAccount == 0){
+//            fromQuantity = savingsAccountAmount;
+//        } else {
+//            fromQuantity = checkingAccountAmount;
+//        }
+//
+//        //checks if fromAccount has enough money for transaction to be valid
+//        if (!enoughMoney(fromQuantity, amount)){
+//            return false;
+//        }
+//
+//        //transfer money
+//        if (fromAccount == 0){
+//            savingsAccountAmount -= amount;
+//            checkingAccountAmount += amount;
+//        } else {
+//            checkingAccountAmount -= amount;
+//            savingsAccountAmount += amount;
+//        }
+//        //transaction completed successfully
+//        return true;
+//    }
+//
+//    //creates printable String of money available in each account
+//    public String obtainAccountBalance(){
+//        return "Savings Account: $" + savingsAccountAmount + "\nChecking Account: $" + checkingAccountAmount;
+//    }
     
 //    //helper methods
 //    public double determineAccountType(String accountType){

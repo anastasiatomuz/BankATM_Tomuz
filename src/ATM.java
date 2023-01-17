@@ -34,8 +34,12 @@ public class ATM {
      */
 
     private Scanner scan;
+    private Account savings;
+    private Account checking;
     public ATM(){
         this.scan = new Scanner(System.in);
+        this.savings = new Account("Savings", 0);
+        this.checking = new Account("Checking", 0);
     }
     public void start() {
         System.out.println("Welcome to the ATM!");
@@ -54,8 +58,10 @@ public class ATM {
         Account savings = new Account("Savings account", 0);
         Account checking = new Account("Checking account", 0);
         System.out.println("Two new accounts have been created");
-        System.out.println(customer.obtainAccountBalance());
+
         menu();
+
+
     }
 
     public void menu(){
@@ -69,17 +75,98 @@ public class ATM {
             System.out.println("5. Change PIN");
             System.out.println("6. Exit");
 
+            System.out.print("What do you wish to do? ");
             int userChoice = scan.nextInt();
 
-            if (userChoice == 3){
-                System.out.println("1. Savings account");
-                System.out.println("2. Checking account");
-                System.out.print("Which account do you want to transfer from? ");
-                int accountFromChoice = scan.nextInt();
-                if (accountFromChoice == 1){
-
+            //make a withdrawal
+            if (userChoice == 1)
+            {
+                Account accountType = getAccountType("What account do you want to transfer from? ");
+                System.out.print("How much do you want to withdraw? $");
+                double moneyToWithdraw = scan.nextDouble();
+                if (enoughMoney(accountType, moneyToWithdraw))
+                {
+                    accountType.withdraw(moneyToWithdraw);
+                }
+                else
+                {
+                    System.out.println("Cannot complete transfer. Insufficient balance in " + accountType + " account");
                 }
             }
+            else if (userChoice == 2)
+            {
+
+                Account accountType = getAccountType("What account do you want to make a deposit to?");
+                System.out.print("How much do you wish to deposit? $");
+                double amountToDeposit = scan.nextDouble();
+                accountType.deposit(amountToDeposit);
+            }
+
+            //complete a transfer
+            else if (userChoice == 3){
+                Account accountType = getAccountType("What account do you want to transfer from?");
+                while (accountType == null)
+                {
+                    System.out.println("Invalid choice");
+                    accountType = getAccountType("What account do you want to transfer from?");
+                }
+                Account other;
+                if (accountType == savings)
+                {
+                    other = checking;
+                }
+                else
+                {
+                    other = savings;
+                }
+
+                System.out.print("How much do you want to transfer? $");
+                double amountToTransfer = scan.nextDouble();
+
+                if (enoughMoney(accountType, amountToTransfer))
+                {
+                    accountType.withdraw(amountToTransfer);
+                    other.deposit(amountToTransfer);
+                    System.out.println("Transfer complete");
+                }
+                else
+                {
+                    System.out.println("Cannot complete transfer. Insufficient balance in " + accountType.getName() + " account");
+                }
+            }
+
+            else if (userChoice == 4){
+                System.out.println(obtainAccountBalance());
+                String wait = scan.nextLine();
+            }
         }
+    }
+
+    private boolean enoughMoney(Account accountName, double moneyToRemove){
+        return accountName.getBalance() - moneyToRemove >= 0;
+    }
+
+    private String obtainAccountBalance(){
+        return "Savings Account: $" + savings.getBalance() + "\nChecking Account: $" + checking.getBalance();
+    }
+
+    private Account getAccountType(String message){
+        Account name;
+        System.out.println("1. Savings account");
+        System.out.println("2. Checking account");
+        System.out.print(message);
+        int accountFromChoice = scan.nextInt();
+        if (accountFromChoice == 1)
+        {
+            name = savings;
+        }
+        else if (accountFromChoice == 2)
+        {
+            name = checking;
+        }
+        else {
+            name = null;
+        }
+        return name;
     }
 }
