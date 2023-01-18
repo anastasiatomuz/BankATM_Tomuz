@@ -51,37 +51,49 @@ public class ATM {
         System.out.println("To use the ATM, you must create an account.\n");
         System.out.print("Please enter your full name: ");
         String userName = scan.nextLine();
+        clearScreen();
         System.out.print("Please enter a four digit PIN you will wish to use to log into your account: ");
         int PIN = scan.nextInt();
+        scan.nextLine();
         while (numDigits(PIN) != 4){
             System.out.println("PIN doesn't match criteria.");
-            System.out.println("PIN must be 4 digit long.");
+            System.out.println("PIN must be 4 digit long and cannot have leading zeros (ie 0021).");
             System.out.print("Enter a new PIN: ");
             PIN = scan.nextInt();
+            scan.nextLine();
         }
         Customer customer = new Customer(userName, PIN);
         Account savings = new Account("Savings account", 0);
         Account checking = new Account("Checking account", 0);
         System.out.println("Two new accounts have been created");
+        clearScreen();
         boolean open = true;
         while (open)
         {
+            clearScreen();
             System.out.print("Please enter your PIN: ");
             int userPIN = scan.nextInt();
+            scan.nextLine();
             while (userPIN != customer.getPIN())
             {
                 System.out.println("The PIN you have entered doesn't match our records");
                 System.out.print("Please enter your PIN: ");
                 userPIN = scan.nextInt();
+                scan.nextLine();
             }
-            menu(customer);
+            open = menu(customer);
             System.out.print("Do you want to do anything else? (y/n) ");
             String continueState = scan.nextLine();
-            if (continueState.toLowerCase().equals("n"))
+
+            if (continueState.equals("y") || continueState.equals("Y"))
+            {
+                open = true;
+            }
+            else if (continueState.equals("N") || continueState.equals("n"))
             {
                 open = false;
             }
-            else if (!continueState.toLowerCase().equals("y")){
+            else {
                 System.out.println("Invalid answer");
             }
         }
@@ -101,6 +113,7 @@ public class ATM {
 
         System.out.print("What do you wish to do? ");
         int userChoice = scan.nextInt();
+        scan.nextLine();
 
         //make a withdrawal
         if (userChoice == 1)
@@ -108,12 +121,14 @@ public class ATM {
             Account accountType = getAccountType("What account do you want to make a  withdrawal from? ");
             System.out.print("How much do you want to withdraw? $");
             int moneyToWithdraw = scan.nextInt();
+            scan.nextLine();
             while (moneyToWithdraw % 5 != 0)
             {
                 System.out.println("This ATM currently only dispenses bills of $5 and $20");
                 System.out.println("Amount to withdraw must be a multiple of 5");
                 System.out.print("How much do you want to withdraw? $");
                 moneyToWithdraw = scan.nextInt();
+                scan.nextLine();
             }
             if (enoughMoney(accountType, moneyToWithdraw))
             {
@@ -135,6 +150,7 @@ public class ATM {
             Account accountType = getAccountType("What account do you want to make a deposit to? ");
             System.out.print("How much do you wish to deposit? $");
             double amountToDeposit = scan.nextDouble();
+            scan.nextLine();
             accountType.deposit(amountToDeposit);
             transactionID ++;
             receiptMessage += "Transaction ID: " + transactionID + "\n$" + amountToDeposit + " deposited successfully";
@@ -162,6 +178,7 @@ public class ATM {
 
             System.out.print("How much do you want to transfer? $");
             double amountToTransfer = scan.nextDouble();
+            scan.nextLine();
 
             if (enoughMoney(fromAccount, amountToTransfer))
             {
@@ -180,18 +197,21 @@ public class ATM {
 
         else if (userChoice == 4)
         {
-            System.out.println(obtainAccountBalance());
+            receiptMessage += obtainAccountBalance();
         }
 
         //change PIN
         else if (userChoice == 5)
         {
+            System.out.print("Enter your new PIN: ");
             int newPIN = scan.nextInt();
+            scan.nextLine();
             while (numDigits(newPIN) != 4){
                 System.out.println("PIN doesn't match criteria.");
                 System.out.println("PIN must be 4 digit long.");
                 System.out.print("Enter a new PIN: ");
                 newPIN = scan.nextInt();
+                scan.nextLine();
             }
             customer.setPIN(newPIN);
             receiptMessage += "PIN changed successfully";
@@ -230,6 +250,7 @@ public class ATM {
         System.out.println("2. Checking account");
         System.out.print(message);
         int accountFromChoice = scan.nextInt();
+        scan.nextLine();
         if (accountFromChoice == 1)
         {
             name = savings;
@@ -276,6 +297,10 @@ public class ATM {
             val2 = theArray[1];
             System.out.println(val1 + "                 " + val2);
         }
+        System.out.print("\nEnter the combination of $20 and $5 you would like to receive: ");
+        int combination = scan.nextInt();
+        scan.nextLine();
+        System.out.println(table.get(combination)[0] + " of $20 bills dispensed and " + table.get(combination)[1] + " of $5 bills dispensed");
     }
 
     private void printReceipt(String customerName, String message)
@@ -287,5 +312,10 @@ public class ATM {
         System.out.println();
         System.out.println(message);
         System.out.println("**************************");
+    }
+
+    public void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }
