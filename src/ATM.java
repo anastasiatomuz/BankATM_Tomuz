@@ -1,3 +1,6 @@
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 public class ATM {
     /*
@@ -36,10 +39,12 @@ public class ATM {
     private Scanner scan;
     private Account savings;
     private Account checking;
+    private int transactionID;
     public ATM(){
         this.scan = new Scanner(System.in);
         this.savings = new Account("Savings", 0);
         this.checking = new Account("Checking", 0);
+        this.transactionID = 10000;
     }
     public void start() {
         System.out.println("Welcome to the ATM!");
@@ -48,7 +53,7 @@ public class ATM {
         String userName = scan.nextLine();
         System.out.print("Please enter a four digit PIN you will wish to use to log into your account: ");
         int PIN = scan.nextInt();
-        while (PIN < 1000 || PIN > 9999){
+        while (numDigits(PIN) != 4){
             System.out.println("PIN doesn't match criteria.");
             System.out.println("PIN must be 4 digit long.");
             System.out.print("Enter a new PIN: ");
@@ -58,99 +63,168 @@ public class ATM {
         Account savings = new Account("Savings account", 0);
         Account checking = new Account("Checking account", 0);
         System.out.println("Two new accounts have been created");
-
-        menu();
-
-
-    }
-
-    public void menu(){
         boolean open = true;
-        while (open) {
-            System.out.println("Here is a list of available actions: ");
-            System.out.println("1. Make a withdrawal");
-            System.out.println("2. Make a deposit");
-            System.out.println("3. Transfer money between accounts");
-            System.out.println("4. Get account balances");
-            System.out.println("5. Change PIN");
-            System.out.println("6. Exit");
-
-            System.out.print("What do you wish to do? ");
-            int userChoice = scan.nextInt();
-
-            //make a withdrawal
-            if (userChoice == 1)
+        while (open)
+        {
+            System.out.print("Please enter your PIN: ");
+            int userPIN = scan.nextInt();
+            while (userPIN != customer.getPIN())
             {
-                Account accountType = getAccountType("What account do you want to transfer from? ");
-                System.out.print("How much do you want to withdraw? $");
-                double moneyToWithdraw = scan.nextDouble();
-                if (enoughMoney(accountType, moneyToWithdraw))
-                {
-                    accountType.withdraw(moneyToWithdraw);
-                }
-                else
-                {
-                    System.out.println("Cannot complete transfer. Insufficient balance in " + accountType + " account");
-                }
+                System.out.println("The PIN you have entered doesn't match our records");
+                System.out.print("Please enter your PIN: ");
+                userPIN = scan.nextInt();
             }
-            else if (userChoice == 2)
+            menu(customer);
+            System.out.print("Do you want to do anything else? (y/n) ");
+            String continueState = scan.nextLine();
+            if (continueState.toLowerCase().equals("n"))
             {
-
-                Account accountType = getAccountType("What account do you want to make a deposit to?");
-                System.out.print("How much do you wish to deposit? $");
-                double amountToDeposit = scan.nextDouble();
-                accountType.deposit(amountToDeposit);
+                open = false;
             }
-
-            //complete a transfer
-            else if (userChoice == 3){
-                Account accountType = getAccountType("What account do you want to transfer from?");
-                while (accountType == null)
-                {
-                    System.out.println("Invalid choice");
-                    accountType = getAccountType("What account do you want to transfer from?");
-                }
-                Account other;
-                if (accountType == savings)
-                {
-                    other = checking;
-                }
-                else
-                {
-                    other = savings;
-                }
-
-                System.out.print("How much do you want to transfer? $");
-                double amountToTransfer = scan.nextDouble();
-
-                if (enoughMoney(accountType, amountToTransfer))
-                {
-                    accountType.withdraw(amountToTransfer);
-                    other.deposit(amountToTransfer);
-                    System.out.println("Transfer complete");
-                }
-                else
-                {
-                    System.out.println("Cannot complete transfer. Insufficient balance in " + accountType.getName() + " account");
-                }
-            }
-
-            else if (userChoice == 4){
-                System.out.println(obtainAccountBalance());
-                String wait = scan.nextLine();
+            else if (!continueState.toLowerCase().equals("y")){
+                System.out.println("Invalid answer");
             }
         }
+        System.out.println("Thank you for visiting. Hope to see you soon.");
+
     }
 
-    private boolean enoughMoney(Account accountName, double moneyToRemove){
+    public boolean menu(Customer customer){
+        String receiptMessage = "";
+        System.out.println("Here is a list of available actions: ");
+        System.out.println("1. Make a withdrawal");
+        System.out.println("2. Make a deposit");
+        System.out.println("3. Transfer money between accounts");
+        System.out.println("4. Get account balances");
+        System.out.println("5. Change PIN");
+        System.out.println("6. Exit");
+
+        System.out.print("What do you wish to do? ");
+        int userChoice = scan.nextInt();
+
+        //make a withdrawal
+        if (userChoice == 1)
+        {
+            Account accountType = getAccountType("What account do you want to make a  withdrawal from? ");
+            System.out.print("How much do you want to withdraw? $");
+            int moneyToWithdraw = scan.nextInt();
+            while (moneyToWithdraw % 5 != 0)
+            {
+                System.out.println("This ATM currently only dispenses bills of $5 and $20");
+                System.out.println("Amount to withdraw must be a multiple of 5");
+                System.out.print("How much do you want to withdraw? $");
+                moneyToWithdraw = scan.nextInt();
+            }
+            if (enoughMoney(accountType, moneyToWithdraw))
+            {
+                accountType.withdraw(moneyToWithdraw);
+                determineBillQuantities(moneyToWithdraw);
+                transactionID ++;
+                receiptMessage += "Transaction ID: " + transactionID + "\n$" + moneyToWithdraw + " withdrawn successfully";
+            }
+            else
+            {
+                receiptMessage += "Cannot complete transfer. Insufficient balance in " + accountType.getName() + " account";
+            }
+            receiptMessage += "\n" + obtainAccountBalance();
+        }
+
+        //make a deposit
+        else if (userChoice == 2)
+        {
+            Account accountType = getAccountType("What account do you want to make a deposit to? ");
+            System.out.print("How much do you wish to deposit? $");
+            double amountToDeposit = scan.nextDouble();
+            accountType.deposit(amountToDeposit);
+            transactionID ++;
+            receiptMessage += "Transaction ID: " + transactionID + "\n$" + amountToDeposit + " deposited successfully";
+            receiptMessage += "\n" + obtainAccountBalance();
+        }
+
+        //complete a transfer
+        else if (userChoice == 3)
+        {
+            Account fromAccount = getAccountType("What account do you want to transfer from?");
+            while (fromAccount == null)
+            {
+                System.out.println("Invalid choice");
+                fromAccount = getAccountType("What account do you want to transfer from?");
+            }
+            Account toAccount;
+            if (fromAccount == savings)
+            {
+                toAccount = checking;
+            }
+            else
+            {
+                toAccount = savings;
+            }
+
+            System.out.print("How much do you want to transfer? $");
+            double amountToTransfer = scan.nextDouble();
+
+            if (enoughMoney(fromAccount, amountToTransfer))
+            {
+                fromAccount.withdraw(amountToTransfer);
+                toAccount.deposit(amountToTransfer);
+                transactionID ++;
+                receiptMessage += "Transaction ID: " + transactionID + "\nTransferred $" + amountToTransfer + " from "
+                        + fromAccount.getName() + " to " + toAccount.getName();
+            }
+            else
+            {
+                receiptMessage += "Cannot complete transfer. Insufficient balance in " + fromAccount.getName() + " account";
+            }
+            receiptMessage += "\n" + obtainAccountBalance();
+        }
+
+        else if (userChoice == 4)
+        {
+            System.out.println(obtainAccountBalance());
+        }
+
+        //change PIN
+        else if (userChoice == 5)
+        {
+            int newPIN = scan.nextInt();
+            while (numDigits(newPIN) != 4){
+                System.out.println("PIN doesn't match criteria.");
+                System.out.println("PIN must be 4 digit long.");
+                System.out.print("Enter a new PIN: ");
+                newPIN = scan.nextInt();
+            }
+            customer.setPIN(newPIN);
+            receiptMessage += "PIN changed successfully";
+        }
+
+        //exit
+        else if (userChoice == 6)
+        {
+            printReceipt(customer.getName(), receiptMessage);
+            return false;
+        }
+
+        else
+        {
+            System.out.println("Invalid choice");
+        }
+
+        printReceipt(customer.getName(), receiptMessage);
+        return true;
+    }
+
+    private boolean enoughMoney(Account accountName, double moneyToRemove)
+    {
         return accountName.getBalance() - moneyToRemove >= 0;
     }
 
-    private String obtainAccountBalance(){
+    private String obtainAccountBalance()
+    {
         return "Savings Account: $" + savings.getBalance() + "\nChecking Account: $" + checking.getBalance();
     }
 
-    private Account getAccountType(String message){
+    private Account getAccountType(String message)
+    {
         Account name;
         System.out.println("1. Savings account");
         System.out.println("2. Checking account");
@@ -168,5 +242,50 @@ public class ATM {
             name = null;
         }
         return name;
+    }
+
+    private int numDigits(int numToCheck)
+    {
+        return (int) (Math.log10(numToCheck) + 1);
+    }
+
+    private void determineBillQuantities(int amount){
+        Map<Integer, Integer[]> table = new HashMap<>();
+        int amtTemp = amount;
+        int methodNum = 0;
+        while (amtTemp >= 20.0){
+            int numOfTwenty = amtTemp / 20;
+            int subtracted = amount - numOfTwenty * 20;
+            int numOfFive = subtracted / 5;
+            methodNum ++;
+            Integer[] solution = {numOfTwenty, numOfFive};
+            table.put(methodNum, solution);
+            amtTemp -= 20;
+        }
+        methodNum ++;
+        int fivesUsed = amount / 5;
+        Integer[] toAdd = {0, fivesUsed};
+        table.put(methodNum, toAdd);
+        System.out.println("Combination     # of $20 bills     # of $5 bills");
+        for (int i = 1; i <= table.size(); i ++){
+            int val1;
+            int val2;
+            System.out.print("     " + i + "                 ");
+            Integer[] theArray = table.get(i);
+            val1 = theArray[0];
+            val2 = theArray[1];
+            System.out.println(val1 + "                 " + val2);
+        }
+    }
+
+    private void printReceipt(String customerName, String message)
+    {
+        System.out.println("**************************");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("Time: " + timestamp);
+        System.out.println("Customer: " + customerName);
+        System.out.println();
+        System.out.println(message);
+        System.out.println("**************************");
     }
 }

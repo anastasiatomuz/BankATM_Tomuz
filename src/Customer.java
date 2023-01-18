@@ -21,6 +21,10 @@ public class Customer {
     {
         PIN = newPIN;
     }
+
+    public String getName(){
+        return name;
+    }
 //
 //    /**
 //    *
@@ -110,38 +114,38 @@ public class Customer {
 //    }
 
     //helper methods
-    private boolean enoughMoney(double account, double amount){
-        return account - amount > 0;
-    }
+//    private boolean enoughMoney(double account, double amount){
+//        return account - amount > 0;
+//    }
     
-    private void determineBillQuantities(int amount){
-        Map<Integer, Integer[]> table = new HashMap<>();
-        int amtTemp = amount;
-        int methodNum = 0;
-        while (amtTemp >= 20.0){
-           int numOfTwenty = amtTemp / 20;
-           int subtracted = amount - numOfTwenty * 20;
-           int numOfFive = subtracted / 5;
-           methodNum ++;
-           Integer[] solution = {numOfTwenty, numOfFive};
-           table.put(methodNum, solution);
-           amtTemp -= 20;
-        }
-        methodNum ++;
-        int fivesUsed = amount / 5;
-        Integer[] toAdd = {0, fivesUsed};
-        table.put(methodNum, toAdd);
-        System.out.println("Combination     # of $20 bills     # of $5 bills");
-        for (int i = 1; i <= table.size(); i ++){
-           int val1;
-           int val2;
-           System.out.print("     " + i + "                 ");
-           Integer[] theArray = table.get(i);
-           val1 = theArray[0];
-           val2 = theArray[1];
-           System.out.println(val1 + "                 " + val2);
-        }
-    }
+//    private void determineBillQuantities(int amount){
+//        Map<Integer, Integer[]> table = new HashMap<>();
+//        int amtTemp = amount;
+//        int methodNum = 0;
+//        while (amtTemp >= 20.0){
+//           int numOfTwenty = amtTemp / 20;
+//           int subtracted = amount - numOfTwenty * 20;
+//           int numOfFive = subtracted / 5;
+//           methodNum ++;
+//           Integer[] solution = {numOfTwenty, numOfFive};
+//           table.put(methodNum, solution);
+//           amtTemp -= 20;
+//        }
+//        methodNum ++;
+//        int fivesUsed = amount / 5;
+//        Integer[] toAdd = {0, fivesUsed};
+//        table.put(methodNum, toAdd);
+//        System.out.println("Combination     # of $20 bills     # of $5 bills");
+//        for (int i = 1; i <= table.size(); i ++){
+//           int val1;
+//           int val2;
+//           System.out.print("     " + i + "                 ");
+//           Integer[] theArray = table.get(i);
+//           val1 = theArray[0];
+//           val2 = theArray[1];
+//           System.out.println(val1 + "                 " + val2);
+//        }
+//    }
 }
 
 

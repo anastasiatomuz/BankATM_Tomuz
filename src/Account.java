@@ -10,9 +10,6 @@ public class Account {
     public void deposit(double moneyToAdd){
         balance += moneyToAdd;
     }
-    public double getBalance(){
-        return balance;
-    }
 
     public void withdraw(double moneyToWithdraw){
         balance -= moneyToWithdraw;
@@ -20,5 +17,17 @@ public class Account {
     public String getName()
     {
         return name;
+    }
+
+    public void addMoney(double newMoney){
+        balance += newMoney;
+    }
+
+    public double getBalance(){
+        return balance;
+    }
+
+    public boolean enoughBalance(double moneyToRemove){
+        return balance - moneyToRemove > 0;
     }
 }
