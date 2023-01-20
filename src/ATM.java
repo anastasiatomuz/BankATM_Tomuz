@@ -220,7 +220,7 @@ public class ATM {
         //exit
         else if (userChoice == 6)
         {
-            printReceipt(customer.getName(), receiptMessage);
+            printReceipt(customer.getName(), "You chose to exit");
             return false;
         }
 
@@ -251,6 +251,14 @@ public class ATM {
         System.out.print(message);
         int accountFromChoice = scan.nextInt();
         scan.nextLine();
+        while (accountFromChoice != 1 && accountFromChoice != 2){
+            System.out.println("\nInvalid choice");
+            System.out.println("1. Savings account");
+            System.out.println("2. Checking account");
+            System.out.print(message);
+            accountFromChoice = scan.nextInt();
+            scan.nextLine();
+        }
         if (accountFromChoice == 1)
         {
             name = savings;
