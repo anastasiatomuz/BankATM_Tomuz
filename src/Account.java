@@ -14,20 +14,13 @@ public class Account {
     public void withdraw(double moneyToWithdraw){
         balance -= moneyToWithdraw;
     }
+
     public String getName()
     {
         return name;
     }
 
-    public void addMoney(double newMoney){
-        balance += newMoney;
-    }
-
     public double getBalance(){
         return balance;
-    }
-
-    public boolean enoughBalance(double moneyToRemove){
-        return balance - moneyToRemove > 0;
     }
 }

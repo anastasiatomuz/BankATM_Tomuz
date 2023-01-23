@@ -2,51 +2,59 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+
+/*
+Program outline
+
+   1. welcome user
+   2. create customer (entering their name and choosing a PIN)
+   3. customer is assigned two accounts
+       - savings account ($0)
+       - checking account ($0)
+
+   Users now have access to their account
+
+   4. User prompted to enter PIN
+   5. Menu
+       - Withdraw money
+           * The ATM can give out $5 and $20 bills, so the customer must enter an amount to withdraw
+             that can be distributed using only these bills; the customer can choose how many of each
+             bill to receive (for example, if they withdraw $40, they can choose two 20’s, eight 5’s,
+             or one 20 and four 5’s).
+           * The customer should not be allowed to enter an invalid amount (i.e. one that is not a
+             multiple of 5, e.g. $17).
+           * If the customer attempts to withdraw more money than is in the account, an error message
+              should occur (“insufficient funds!”)
+
+       - Deposit money
+       - Transfer money between accounts
+       - Get account balances
+       - Change PIN
+       - Exit
+
+   6. After any action, have a confirmation (“receipt”) shown on the screen
+   7. User asked if they want to do anything else
+        -yes: ask for PIN again; return to Main menu
+        -no: thank the user for visiting
+    */
+
 public class ATM {
-    /*
-    1. welcome user
-    2. create customer (entering their name and choosing a PIN)
-    3. customer is assigned two accounts
-        - savings account ($0)
-        - checking account ($0)
-
-    Users now have access to their account
-
-    4. User prompted to enter PIN
-    5. Menu
-        - Withdraw money
-            * The ATM can give out $5 and $20 bills, so the customer must enter an amount to withdraw
-              that can be distributed using only these bills; the customer can choose how many of each
-              bill to receive (for example, if they withdraw $40, they can choose two 20’s, eight 5’s,
-              or one 20 and four 5’s).
-            * The customer should not be allowed to enter an invalid amount (i.e. one that is not a
-              multiple of 5, e.g. $17).
-            * If the customer attempts to withdraw more money than is in the account, an error message
-               should occur (“insufficient funds!”)
-
-        - Deposit money
-        - Transfer money between accounts
-        - Get account balances
-        - Change PIN
-        - Exit
-
-    6. After any action, have a confirmation (“receipt”) shown on the screen
-    7. User asked if they want to do anything else
-         -yes: ask for PIN again; return to Main menu
-         -no: thank the user for visiting
-     */
-
     private Scanner scan;
     private Account savings;
     private Account checking;
     private int transactionID;
+    private Customer customer;
+
     public ATM(){
         this.scan = new Scanner(System.in);
         this.savings = new Account("Savings", 0);
         this.checking = new Account("Checking", 0);
-        this.transactionID = 10000;
+        this.transactionID = 10000; //beginning transaction ID that increases as number of transactions increase
     }
+
     public void start() {
+        //
         System.out.println("Welcome to the ATM!");
         System.out.println("To use the ATM, you must create an account.\n");
         System.out.print("Please enter your full name: ");
@@ -62,14 +70,17 @@ public class ATM {
             PIN = scan.nextInt();
             scan.nextLine();
         }
-        Customer customer = new Customer(userName, PIN);
+        customer = new Customer(userName, PIN);
         Account savings = new Account("Savings account", 0);
         Account checking = new Account("Checking account", 0);
         System.out.println("Two new accounts have been created");
         clearScreen();
+
+        //runs the main program while the user chooses not to exit and chooses to continue on
         boolean open = true;
         while (open)
         {
+            //asks user to enter PIN each time they perform an action (acess the main menu)
             clearScreen();
             System.out.print("Please enter your PIN: ");
             int userPIN = scan.nextInt();
@@ -81,10 +92,9 @@ public class ATM {
                 userPIN = scan.nextInt();
                 scan.nextLine();
             }
-            open = menu(customer);
+            open = menu();
             System.out.print("Do you want to do anything else? (y/n) ");
             String continueState = scan.nextLine();
-
             if (continueState.equals("y") || continueState.equals("Y"))
             {
                 open = true;
@@ -101,7 +111,11 @@ public class ATM {
 
     }
 
-    public boolean menu(Customer customer){
+    /* helper method accessed in start method that lists out the menu option and asks user which option they want to choose
+    uses if else statements to which option user chooses and calls appropriate methods
+    returns true if the user wishes to continue using the ATM, false if they want to exit
+     */
+    private boolean menu(){
         String receiptMessage = "";
         System.out.println("Here is a list of available actions: ");
         System.out.println("1. Make a withdrawal");
@@ -118,11 +132,12 @@ public class ATM {
         //make a withdrawal
         if (userChoice == 1)
         {
+            //asks user info like what account they want to withdraw from and how much they want to withdraw
             Account accountType = getAccountType("What account do you want to make a  withdrawal from? ");
             System.out.print("How much do you want to withdraw? $");
             int moneyToWithdraw = scan.nextInt();
             scan.nextLine();
-            while (moneyToWithdraw % 5 != 0)
+            while (moneyToWithdraw % 5 != 0) //checks if the amount user wants to withdraw is a multiple of 5
             {
                 System.out.println("This ATM currently only dispenses bills of $5 and $20");
                 System.out.println("Amount to withdraw must be a multiple of 5");
@@ -130,6 +145,9 @@ public class ATM {
                 moneyToWithdraw = scan.nextInt();
                 scan.nextLine();
             }
+            /*if all conditions are acceptable, withdraws money from account and lists combination of
+            5 and 20 dollar bills
+            */
             if (enoughMoney(accountType, moneyToWithdraw))
             {
                 accountType.withdraw(moneyToWithdraw);
@@ -145,6 +163,10 @@ public class ATM {
         }
 
         //make a deposit
+        /*
+        asks which account user wants to make a deposit to and how much they want to transfer
+        deposits money and creates appropriate message for receipt
+         */
         else if (userChoice == 2)
         {
             Account accountType = getAccountType("What account do you want to make a deposit to? ");
