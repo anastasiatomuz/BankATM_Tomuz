@@ -48,11 +48,18 @@ public class ATM {
 
     public ATM(){
         this.scan = new Scanner(System.in);
-        this.savings = new Account("Savings", 0);
-        this.checking = new Account("Checking", 0);
         this.transactionID = 10000; //beginning transaction ID that increases as number of transactions increase
     }
 
+    /**
+     * The central method that starts the program (the ATM)
+     *
+     * finds user's name and PIN
+     *
+     * Creates Customer object and Account objects
+     * References menu helper method that displays and carries out available functions of the ATM
+     * When user is done using the ATM, program prints goodbye message
+     */
     public void start() {
         //
         System.out.println("Welcome to the ATM!");
@@ -70,9 +77,10 @@ public class ATM {
             PIN = scan.nextInt();
             scan.nextLine();
         }
+        //creates customer, and two account objects
         customer = new Customer(userName, PIN);
-        Account savings = new Account("Savings account", 0);
-        Account checking = new Account("Checking account", 0);
+        savings = new Account("Savings account", 0);
+        checking = new Account("Checking account", 0);
         System.out.println("Two new accounts have been created");
         clearScreen();
 
@@ -80,7 +88,7 @@ public class ATM {
         boolean open = true;
         while (open)
         {
-            //asks user to enter PIN each time they perform an action (acess the main menu)
+            //asks user to enter PIN each time they perform an action (accesses the main menu)
             clearScreen();
             System.out.print("Please enter your PIN: ");
             int userPIN = scan.nextInt();
@@ -111,9 +119,14 @@ public class ATM {
 
     }
 
-    /* helper method accessed in start method that lists out the menu option and asks user which option they want to choose
-    uses if else statements to which option user chooses and calls appropriate methods
-    returns true if the user wishes to continue using the ATM, false if they want to exit
+
+    /**
+     * helper method accessed in start method that lists out the menu option and asks user which option they want
+     * to choose
+     *
+     * uses if else statements to which option user chooses and calls appropriate methods
+     *
+     * @return true if the user wishes to continue using the ATM, false if they want to exit
      */
     private boolean menu(){
         String receiptMessage = "";
@@ -180,6 +193,10 @@ public class ATM {
         }
 
         //complete a transfer
+        /*
+        asks user which account they want to transfer from and how much they want to transfer
+        if there's enough money to complete the transfer, the money is transferred and a message for the receipt is created
+         */
         else if (userChoice == 3)
         {
             Account fromAccount = getAccountType("What account do you want to transfer from?");
@@ -217,6 +234,7 @@ public class ATM {
             receiptMessage += "\n" + obtainAccountBalance();
         }
 
+        //sets the receipt to print the balance available in the two accounts
         else if (userChoice == 4)
         {
             receiptMessage += obtainAccountBalance();
@@ -240,9 +258,10 @@ public class ATM {
         }
 
         //exit
+        //returns false to indicate that the user doesn't wish to continue using the ATM
         else if (userChoice == 6)
         {
-            printReceipt(customer.getName(), "You chose to exit");
+            printReceipt("You chose to exit");
             return false;
         }
 
@@ -251,20 +270,42 @@ public class ATM {
             System.out.println("Invalid choice");
         }
 
-        printReceipt(customer.getName(), receiptMessage);
-        return true;
+        //a receipt is displayed at the end of each action
+        printReceipt(receiptMessage);
+        return true; //to indicate user's wish to continue using ATM
     }
 
+    /**
+     * helper method that determines if an action should be carried out so that the user won't be in debt afterwards
+     *
+     * @param accountName Account object indicates which account user wants to withdraw from
+     * @param moneyToRemove the "amount indicated" to remove
+     * @return a boolean if the user has enough money in their account
+     *         true: by removing the amount indicated, user would have $0, or more in their account
+     *         false: by removing the amount indicated, user would have less than $0 in their account (they would be in debt)
+     */
     private boolean enoughMoney(Account accountName, double moneyToRemove)
     {
         return accountName.getBalance() - moneyToRemove >= 0;
     }
 
+    /**
+     * returns a String literal with current balances in the two accounts
+     *
+     * used for printing receipts that announces user how much they have in their accounts
+     * and when the user chooses to check their account balances
+     */
     private String obtainAccountBalance()
     {
         return "Savings Account: $" + savings.getBalance() + "\nChecking Account: $" + checking.getBalance();
     }
 
+    /**
+     * Determines the Account object the user wants to perform action on
+     *
+     * @param message used for printing a message appropriate when the account type needs to be accessed
+     * @return Account object that the user wants to perform an action on
+     */
     private Account getAccountType(String message)
     {
         Account name;
@@ -290,17 +331,38 @@ public class ATM {
             name = checking;
         }
         else {
-            name = null;
+            name = null; //returns null if the user chooses an "invalid choice"
         }
         return name;
     }
 
+    /**
+     * determines the number of digits in an integer
+     * helpful for creating a 4-digit PIN
+     *
+     * @param numToCheck the integer that we want to determine the number of digits it contains
+     * @return the number of digits in the parameter number
+     */
     private int numDigits(int numToCheck)
     {
         return (int) (Math.log10(numToCheck) + 1);
     }
 
+    /**
+     * finds the "combination" of 5 and 20 dollar bills that can be made given an amount
+     * precondition: amount must be a multiple of 5
+     * @param amount the dollar amount that needs to find the combination of 5 and 20 dollar bills
+     */
     private void determineBillQuantities(int amount){
+        /*
+        Use of hashmap to store key as "combination number" and value as an integer list with two values:
+        number of 20 dollar bills (index 0) and number of 5 dollar bills (index 1).
+
+        Iterates through the possible values that can be made with $20 bills until the combination can't be made
+        with a 20.
+        */
+
+        //credits for inspiration: https://stackoverflow.com/questions/4126272/how-do-i-implement-nested-arraylist
         Map<Integer, Integer[]> table = new HashMap<>();
         int amtTemp = amount;
         int methodNum = 0;
@@ -317,6 +379,8 @@ public class ATM {
         int fivesUsed = amount / 5;
         Integer[] toAdd = {0, fivesUsed};
         table.put(methodNum, toAdd);
+
+        //"iterates" through a hashmap by combination counter to print the table of all possible combinations
         System.out.println("Combination     # of $20 bills     # of $5 bills");
         for (int i = 1; i <= table.size(); i ++){
             int val1;
@@ -327,23 +391,31 @@ public class ATM {
             val2 = theArray[1];
             System.out.println(val1 + "                 " + val2);
         }
+        //lets the user choose which combination they want to withdraw
         System.out.print("\nEnter the combination of $20 and $5 you would like to receive: ");
         int combination = scan.nextInt();
         scan.nextLine();
         System.out.println(table.get(combination)[0] + " of $20 bills dispensed and " + table.get(combination)[1] + " of $5 bills dispensed");
     }
 
-    private void printReceipt(String customerName, String message)
+    /**
+     * Prints a receipt of what action the user has just completed
+     * @param message String literal whether action was completed successfully, or unsuccessfully
+     */
+    private void printReceipt(String message)
     {
         System.out.println("**************************");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println("Time: " + timestamp);
-        System.out.println("Customer: " + customerName);
+        System.out.println("Customer: " + customer.getName());
         System.out.println();
         System.out.println(message);
         System.out.println("**************************");
     }
 
+    /**
+     * helps clear the print statements so the console is appealing to the eye
+     */
     public void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
